@@ -155,19 +155,19 @@ class MicRecorder {
    * Requests access to the microphone and start recording
    * @return Promise
    */
-  start() {
+  start(constraints) {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     this.context = new AudioContext();
     this.config.sampleRate = this.context.sampleRate;
     this.lameEncoder = new Encoder(this.config);
 
-    const audio = this.config.deviceId
+    const fullConstraints = this.config.deviceId
       ? { deviceId: { exact: this.config.deviceId } }
-      : true;
+      : constraints || { audio: true };
 
     return new Promise((resolve, reject) => {
       navigator.mediaDevices
-        .getUserMedia({ audio })
+        .getUserMedia(fullConstraints)
         .then((stream) => this.addMicrophoneListener(stream))
         .then(() => resolve())
         .catch(function (err) {
