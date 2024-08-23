@@ -15938,24 +15938,37 @@ var MicRecorder = function () {
 
   }, {
     key: "start",
-    value: function start(constraints) {
+    value: function start(_ref) {
       var _this3 = this;
+
+      var constraints = _ref.constraints,
+          stream = _ref.stream;
 
       var AudioContext = window.AudioContext || window.webkitAudioContext;
       this.context = new AudioContext();
       this.config.sampleRate = this.context.sampleRate;
       this.lameEncoder = new Encoder(this.config);
 
-      var fullConstraints = this.config.deviceId ? { deviceId: { exact: this.config.deviceId } } : constraints || { audio: true };
-
       return new Promise(function (resolve, reject) {
-        navigator.mediaDevices.getUserMedia(fullConstraints).then(function (stream) {
-          return _this3.addMicrophoneListener(stream);
-        }).then(function () {
-          return resolve();
-        }).catch(function (err) {
-          reject(err);
-        });
+        if (stream instanceof MediaStream) {
+          // If a stream is provided, use it directly
+          _this3.addMicrophoneListener(stream).then(function () {
+            return resolve();
+          }).catch(function (err) {
+            return reject(err);
+          });
+        } else {
+          // If constraints are provided, use them to get a MediaStream
+          var fullConstraints = _this3.config.deviceId ? { deviceId: { exact: _this3.config.deviceId } } : constraints || { audio: true };
+
+          navigator.mediaDevices.getUserMedia(fullConstraints).then(function (stream) {
+            return _this3.addMicrophoneListener(stream);
+          }).then(function () {
+            return resolve();
+          }).catch(function (err) {
+            return reject(err);
+          });
+        }
       });
     }
 
