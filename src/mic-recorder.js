@@ -155,7 +155,7 @@ class MicRecorder {
    * Requests access to the microphone and start recording
    * @return Promise
    */
-  start({ constraints, stream }) {
+  start({ constraints, stream } = {}) {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     this.context = new AudioContext();
     this.config.sampleRate = this.context.sampleRate;
